@@ -11,7 +11,7 @@ export const lv: Dictionary = {
   links: {
     temturis: "Drīzumā",
     caballero: "UX Lead @ Caballero",
-    bb: "Librarian @ Biznesa Bibliotēka",
+    bb: "Bibliotekārs @ Biznesa Bibliotēka",
     linkedin: "LinkedIn",
     threads: "Threads",
     x: "X",
