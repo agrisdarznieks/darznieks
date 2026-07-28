@@ -15,7 +15,12 @@ export const post = defineType({
       name: "slug",
       title: "Slug",
       type: "slug",
-      options: { source: "title.en", maxLength: 96 },
+      options: {
+        source: "title.en",
+        maxLength: 96,
+        // Enforce a globally-unique slug across all posts.
+        isUnique: (value, context) => context.defaultIsUnique(value, context),
+      },
       validation: (r) => r.required(),
     }),
     defineField({
@@ -31,6 +36,7 @@ export const post = defineType({
       options: { hotspot: true },
     }),
     defineField({ name: "body", title: "Body", type: "localeBlockContent" }),
+    defineField({ name: "seo", title: "SEO & social sharing", type: "seo" }),
   ],
   orderings: [
     {

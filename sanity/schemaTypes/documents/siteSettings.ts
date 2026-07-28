@@ -30,6 +30,7 @@ export const siteSettings = defineType({
       type: "localeString",
     }),
     defineField({ name: "footer", title: "Footer", type: "localeString" }),
+    defineField({ name: "seo", title: "SEO & social sharing", type: "seo" }),
   ],
   preview: {
     prepare: () => ({ title: "Link-in-Bio (Homepage)" }),

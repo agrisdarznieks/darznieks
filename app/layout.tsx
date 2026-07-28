@@ -20,9 +20,11 @@ const merriweatherSans = Merriweather_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Agris Dārznieks",
+  metadataBase: new URL("https://darznieks.com"),
+  title: "Agris Dārznieks — Experience designer & Notion consultant",
   description:
     "Collector of knowledge, journeys, and life experiences. Book excerpts, UX design principles, and tips on Notion, Claude, and other digital tools.",
+  robots: { index: true, follow: true },
 };
 
 export default async function RootLayout({

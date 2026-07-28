@@ -5,5 +5,9 @@ export default defineCliConfig({
     projectId: "oqf42bbg",
     dataset: "production",
   },
-  autoUpdates: true,
+  studioHost: "darznieks",
+  deployment: {
+    appId: "h9ivpe5lfkjvrcukggn7oa4n",
+    autoUpdates: true,
+  },
 });

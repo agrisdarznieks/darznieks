@@ -1,6 +1,7 @@
 import { localeString } from "./objects/localeString";
 import { localeText } from "./objects/localeText";
 import { localeBlockContent } from "./objects/localeBlockContent";
+import { seo } from "./objects/seo";
 import { siteSettings } from "./documents/siteSettings";
 import { linkCard } from "./documents/linkCard";
 import { post } from "./documents/post";
@@ -14,4 +15,5 @@ export const schemaTypes = [
   localeString,
   localeText,
   localeBlockContent,
+  seo,
 ];

@@ -7,7 +7,12 @@ export const siteSettingsQuery = `*[_type == "siteSettings"][0]{
   buildingHeading,
   findMeHeading,
   footer,
-  "avatarUrl": avatar.asset->url
+  "avatarUrl": avatar.asset->url,
+  seo{
+    metaTitle,
+    metaDescription,
+    ogImage
+  }
 }`;
 
 export const linkCardsQuery = `*[_type == "linkCard"] | order(order asc){

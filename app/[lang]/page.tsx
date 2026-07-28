@@ -6,6 +6,19 @@ import { getDictionary, isLang } from "@/lib/i18n";
 import { getHomeContent, type HomeCard } from "@/lib/content";
 import { resolveIcon } from "@/lib/icons";
 
+const SITE_URL = "https://darznieks.com";
+const DEFAULT_OG = `${SITE_URL}/images/avatar.jpg`;
+
+// Canonical identity links for the JSON-LD Person entity (AI / search
+// discoverability). Stable — update if a profile handle changes.
+const SAME_AS = [
+  "https://www.linkedin.com/in/agrisdarznieks",
+  "https://www.threads.net/@agrisdarznieks",
+  "https://x.com/agrisdarznieks",
+  "https://agrisdarznieks.substack.com",
+  "https://www.instagram.com/agrisdarznieks",
+];
+
 // ISR — re-fetch Sanity content at most once a minute.
 export const revalidate = 60;
 
@@ -17,9 +30,33 @@ export async function generateMetadata({
   const { lang } = await params;
   const L = isLang(lang) ? lang : "en";
   const c = await getHomeContent(L);
+
+  const title = c.metaTitle || `${c.name} — ${c.tagline}`;
+  const description = c.metaDescription || c.bio;
+  const ogImage = c.ogImageUrl || c.avatarUrl || DEFAULT_OG;
+
   return {
-    title: `${c.name} — ${c.tagline}`,
-    description: c.bio,
+    title,
+    description,
+    alternates: {
+      canonical: `/${L}`,
+      languages: { en: "/en", lv: "/lv", "x-default": "/en" },
+    },
+    openGraph: {
+      type: "website",
+      url: `${SITE_URL}/${L}`,
+      siteName: c.name,
+      title,
+      description,
+      locale: L === "lv" ? "lv_LV" : "en_US",
+      images: [{ url: ogImage, width: 1200, height: 630, alt: c.name }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [ogImage],
+    },
   };
 }
 
@@ -53,8 +90,23 @@ export default async function HomePage({
   const building = c.cards.filter((x) => x.section === "building");
   const findMe = c.cards.filter((x) => x.section === "findMe");
 
+  const personLd = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: c.name,
+    url: SITE_URL,
+    image: c.avatarUrl || DEFAULT_OG,
+    jobTitle: c.tagline,
+    sameAs: SAME_AS,
+  };
+
   return (
     <div className="max-w-[480px] mx-auto px-4 py-12 md:py-16">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(personLd) }}
+      />
+
       <header>
         <ToggleRow lang={L} a11y={dict.a11y} />
 

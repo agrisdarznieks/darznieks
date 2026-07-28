@@ -1,4 +1,5 @@
 import { client } from "@/sanity/lib/client";
+import { urlFor, type SanityImageSource } from "@/sanity/lib/image";
 import { siteSettingsQuery, linkCardsQuery } from "@/sanity/lib/queries";
 import { getDictionary } from "@/lib/i18n";
 import type { Dictionary, Lang } from "@/lib/i18n/types";
@@ -21,12 +22,20 @@ export interface HomeContent {
   findMeHeading: string;
   footer: string;
   cards: HomeCard[];
+  // SEO overrides (null when not set in Studio → the page uses its defaults).
+  metaTitle: string | null;
+  metaDescription: string | null;
+  ogImageUrl: string | null;
 }
 
 type Locale = { en?: string; lv?: string } | null | undefined;
 
 function pick(value: Locale, lang: Lang, fallback: string): string {
   return (value && (value[lang] ?? value.en)) || fallback;
+}
+
+function pickOrNull(value: Locale, lang: Lang): string | null {
+  return (value && (value[lang] ?? value.en)) || null;
 }
 
 // Code fallback — the current site content, so the page renders even before
@@ -44,6 +53,12 @@ function fallbackCards(dict: Dictionary): HomeCard[] {
   ];
 }
 
+interface RawSeo {
+  metaTitle?: Locale;
+  metaDescription?: Locale;
+  ogImage?: SanityImageSource;
+}
+
 interface RawSettings {
   name?: string;
   tagline?: Locale;
@@ -52,6 +67,7 @@ interface RawSettings {
   buildingHeading?: Locale;
   findMeHeading?: Locale;
   footer?: Locale;
+  seo?: RawSeo;
 }
 
 interface RawCard {
@@ -90,6 +106,18 @@ export async function getHomeContent(lang: Lang): Promise<HomeContent> {
       }))
     : fallbackCards(dict);
 
+  // Build a 1200×630 OpenGraph URL off the Sanity image CDN when an ogImage
+  // is set; otherwise leave null and let the page fall back to the avatar.
+  let ogImageUrl: string | null = null;
+  const og = settings?.seo?.ogImage;
+  if (og) {
+    try {
+      ogImageUrl = urlFor(og).width(1200).height(630).fit("crop").url();
+    } catch {
+      ogImageUrl = null;
+    }
+  }
+
   return {
     name: settings?.name || dict.name,
     tagline: pick(settings?.tagline, lang, dict.tagline),
@@ -99,5 +127,8 @@ export async function getHomeContent(lang: Lang): Promise<HomeContent> {
     findMeHeading: pick(settings?.findMeHeading, lang, dict.sections.findMe),
     footer: pick(settings?.footer, lang, dict.footer),
     cards: mappedCards,
+    metaTitle: pickOrNull(settings?.seo?.metaTitle, lang),
+    metaDescription: pickOrNull(settings?.seo?.metaDescription, lang),
+    ogImageUrl,
   };
 }
