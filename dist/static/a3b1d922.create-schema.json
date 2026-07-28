@@ -44,6 +44,15 @@
       {
         "name": "footer",
         "type": "localeString"
+      },
+      {
+        "options": {
+          "collapsible": true,
+          "collapsed": true
+        },
+        "name": "seo",
+        "type": "seo",
+        "title": "SEO & social sharing"
       }
     ],
     "name": "siteSettings",
@@ -247,6 +256,15 @@
       {
         "name": "body",
         "type": "localeBlockContent"
+      },
+      {
+        "options": {
+          "collapsible": true,
+          "collapsed": true
+        },
+        "name": "seo",
+        "type": "seo",
+        "title": "SEO & social sharing"
       }
     ],
     "name": "post",
@@ -551,5 +569,37 @@
     "name": "localeBlockContent",
     "type": "object",
     "title": "Localized rich text"
+  },
+  {
+    "options": {
+      "collapsible": true,
+      "collapsed": true
+    },
+    "fields": [
+      {
+        "description": "Overrides the browser-tab + search-result title. ~50–60 characters. Leave blank to use the page's default (name — tagline).",
+        "name": "metaTitle",
+        "type": "localeString",
+        "title": "Meta title (override)"
+      },
+      {
+        "description": "The search-result / social snippet. ~150–160 characters. Leave blank to use the bio (or a post's excerpt).",
+        "name": "metaDescription",
+        "type": "localeText",
+        "title": "Meta description"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "description": "Shown when the link is shared on LinkedIn, X, Threads, etc. Ideal size 1200×630px. Leave blank to fall back to the avatar.",
+        "name": "ogImage",
+        "type": "image",
+        "title": "Social share image"
+      }
+    ],
+    "name": "seo",
+    "type": "object",
+    "title": "SEO & social sharing"
   }
 ]
