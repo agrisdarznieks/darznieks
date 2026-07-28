@@ -2,7 +2,7 @@ import type { Dictionary } from "./types";
 
 export const en: Dictionary = {
   name: "Agris Dārznieks",
-  tagline: "Building Experiences",
+  tagline: "Experience designer & Notion consultant",
   bio: "Collector of knowledge, journeys, and life experiences. I share book excerpts, UX design principles, and tips on Notion, Claude, and other digital tools.",
   sections: {
     building: "What I'm building",

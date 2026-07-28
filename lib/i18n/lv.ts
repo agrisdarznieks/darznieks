@@ -2,7 +2,7 @@ import type { Dictionary } from "./types";
 
 export const lv: Dictionary = {
   name: "Agris Dārznieks",
-  tagline: "Pieredzes dizainers",
+  tagline: "Pieredzes dizainers un Notion konsultants",
   bio: "Zināšanu, ceļojumu un dzīves pieredžu kolekcionārs. Dalos ar grāmatu lappusēm, UX dizaina principiem, Notion, Claude un citu digitālo rīku padomiem.",
   sections: {
     building: "Ko es veidoju",
