@@ -25,4 +25,10 @@ export const en: Dictionary = {
     switchToEn: "Switch to English",
     switchToLv: "Pārslēgties uz latviešu valodu",
   },
+  consent: {
+    message:
+      "I use privacy-friendly analytics to understand how this site is used. Cookies load only with your consent.",
+    accept: "Accept",
+    decline: "Decline",
+  },
 };

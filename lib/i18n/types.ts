@@ -25,4 +25,9 @@ export interface Dictionary {
     switchToEn: string;
     switchToLv: string;
   };
+  consent: {
+    message: string;
+    accept: string;
+    decline: string;
+  };
 }

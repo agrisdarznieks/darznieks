@@ -25,4 +25,10 @@ export const lv: Dictionary = {
     switchToEn: "Switch to English",
     switchToLv: "Pārslēgties uz latviešu valodu",
   },
+  consent: {
+    message:
+      "Izmantoju privātumu cienošu analītiku, lai saprastu, kā šo vietni lieto. Sīkdatnes tiek ieslēgtas tikai ar tavu piekrišanu.",
+    accept: "Piekrītu",
+    decline: "Noraidu",
+  },
 };
