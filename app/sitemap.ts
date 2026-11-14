@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { languages } from "@/lib/i18n";
+import { getRoutableThemes } from "@/lib/themes";
 import { getCaseStudySlugs } from "@/lib/work";
 import { getPostSlugs } from "@/lib/writing";
 
@@ -28,7 +29,11 @@ function localized(
 // Served at /sitemap.xml. Locale homepages, work, writing, and each published
 // slug. Documents added in Sanity appear after the webhook or the ISR window.
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [posts, studies] = await Promise.all([getPostSlugs(), getCaseStudySlugs()]);
+  const [posts, studies, themes] = await Promise.all([
+    getPostSlugs(),
+    getCaseStudySlugs(),
+    getRoutableThemes("en"),
+  ]);
 
   return [
     ...localized("", 1, "monthly"),
@@ -37,6 +42,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...studies.flatMap((study) =>
       localized(`/work/${study.slug}`, 0.6, "monthly", study.updatedAt),
     ),
+    ...themes.flatMap((theme) => localized(`/writing/${theme.slug}`, 0.5, "weekly")),
     ...posts.flatMap((post) =>
       localized(
         `/writing/${post.slug}`,

@@ -6,6 +6,7 @@ import { SiteFrame } from "@/components/custom/SiteFrame";
 import { formatPublished } from "@/lib/cms";
 import { getDictionary, isLang } from "@/lib/i18n";
 import { localizedMetadata } from "@/lib/metadata";
+import { getRoutableThemes } from "@/lib/themes";
 import { getPosts } from "@/lib/writing";
 
 export const revalidate = 60;
@@ -34,7 +35,7 @@ export default async function WritingPage({
   const { lang } = await params;
   if (!isLang(lang)) notFound();
   const dict = getDictionary(lang);
-  const posts = await getPosts(lang);
+  const [posts, themes] = await Promise.all([getPosts(lang), getRoutableThemes(lang)]);
 
   return (
     <SiteFrame lang={lang}>
@@ -45,6 +46,22 @@ export default async function WritingPage({
         </p>
       </header>
       <main id="main-content">
+        {themes.length > 0 ? (
+          <nav aria-label={dict.writing.themes} className="mt-8">
+            <ul className="flex flex-col">
+              {themes.map((theme) => (
+                <li key={theme.slug}>
+                  <Link
+                    href={`/${lang}/writing/${theme.slug}`}
+                    className="inline-flex min-h-11 items-center font-sans text-base text-foreground underline decoration-border underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  >
+                    {theme.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        ) : null}
         {posts.length === 0 ? (
           <p className="mt-10 font-serif text-base leading-[1.75] text-muted-foreground">
             {dict.writing.empty}

@@ -15,6 +15,10 @@ export const structure: StructureResolver = (S) =>
         ),
       S.divider(),
       S.documentTypeListItem("caseStudy").title("Case studies"),
+      S.documentTypeListItem("client").title("Clients"),
       S.documentTypeListItem("post").title("Blog posts"),
+      S.documentTypeListItem("theme").title("Themes"),
+      S.documentTypeListItem("page").title("Pages"),
+      S.documentTypeListItem("openQuestion").title("Open questions"),
       S.documentTypeListItem("linkCard").title("Link cards"),
     ]);

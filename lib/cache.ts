@@ -15,6 +15,10 @@ export const SANITY_TAGS = {
   linkCard: "linkCard",
   post: "post",
   caseStudy: "caseStudy",
+  theme: "theme",
+  client: "client",
+  page: "page",
+  openQuestion: "openQuestion",
 } as const;
 
 export type SanityTag = (typeof SANITY_TAGS)[keyof typeof SANITY_TAGS];

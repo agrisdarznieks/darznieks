@@ -134,6 +134,28 @@ export default async function CaseStudyPage({
             <RichText value={study.outcomes} lang={lang} imageFallback={dict.a11y.image} />
           </section>
         ) : null}
+        {study.related.length > 0 ? (
+          <section aria-labelledby="related-writing" className="mt-10">
+            <h2
+              id="related-writing"
+              className="font-sans text-xs uppercase tracking-widest text-muted-foreground"
+            >
+              {dict.work.related}
+            </h2>
+            <ul className="mt-2">
+              {study.related.map((item) => (
+                <li key={item.slug}>
+                  <Link
+                    href={`/${lang}/writing/${item.slug}`}
+                    className="inline-flex min-h-11 items-center font-sans text-base underline decoration-border underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  >
+                    {item.title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
         {study.tags.length > 0 ? (
           <ul aria-label={dict.work.tags} className="mt-10 flex flex-wrap gap-x-3 gap-y-1">
             {study.tags.map((tag) => (

@@ -48,6 +48,7 @@ export const en: Dictionary = {
     role: "Role",
     timeframe: "Timeframe",
     tags: "Tags",
+    related: "Related writing",
   },
   writing: {
     title: "Writing",
@@ -55,6 +56,8 @@ export const en: Dictionary = {
     empty: "No posts published yet.",
     back: "All writing",
     tags: "Tags",
+    themes: "Themes",
+    related: "Related writing",
   },
   notFound: {
     title: "Page not found",

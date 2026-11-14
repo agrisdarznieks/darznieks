@@ -1,8 +1,7 @@
-import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse, type NextRequest } from "next/server";
 import { parseBody } from "next-sanity/webhook";
 import { SANITY_TAG_SET } from "@/lib/cache";
-import { languages } from "@/lib/i18n";
+import { revalidateContent } from "@/lib/revalidate-content";
 
 interface WebhookBody {
   _type?: string;
@@ -24,7 +23,7 @@ function readSlug(slug: WebhookBody["slug"]): string | null {
  *
  * Webhook: POST https://darznieks.com/api/revalidate
  * Trigger: create, update, delete
- * Filter: _type in ["post", "caseStudy", "siteSettings", "linkCard"]
+ * Filter: _type in ["post", "caseStudy", "theme", "client", "page", "siteSettings", "linkCard"]
  * Projection: {_type, "slug": slug.current}
  *
  * A full document payload is also accepted (`slug.current`).
@@ -53,21 +52,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: true, ignored: type ?? null });
   }
 
-  revalidateTag(type);
-  revalidatePath("/sitemap.xml");
-  revalidatePath("/llms.txt");
-
   const slug = readSlug(body.slug);
-  if (type === "siteSettings" || type === "linkCard") {
-    for (const lang of languages) revalidatePath(`/${lang}`);
-  }
-  if (type === "post" || type === "caseStudy") {
-    const section = type === "post" ? "writing" : "work";
-    for (const lang of languages) {
-      revalidatePath(`/${lang}/${section}`);
-      if (slug) revalidatePath(`/${lang}/${section}/${slug}`);
-    }
-  }
+  revalidateContent(type, slug);
 
   return NextResponse.json({ ok: true, revalidated: type, slug });
 }

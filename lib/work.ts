@@ -10,6 +10,11 @@ import {
   caseStudySlugsQuery,
 } from "@/sanity/lib/queries";
 
+export interface RelatedWriting {
+  slug: string;
+  title: string;
+}
+
 export interface CaseStudySummary {
   slug: string;
   title: string;
@@ -30,6 +35,7 @@ export interface CaseStudy extends CaseStudySummary {
   metaTitle: string | null;
   metaDescription: string | null;
   ogImageUrl: string | null;
+  related: RelatedWriting[];
 }
 
 export interface ContentSlug {
@@ -55,21 +61,36 @@ interface RawCaseStudy {
   outcomes?: { en?: unknown; lv?: unknown } | null;
   featured?: boolean | null;
   tags?: unknown;
+  year?: number | null;
+  clientName?: string | null;
+  clientPublicName?: string | null;
+  facts?: { mayBePublic?: string | null } | null;
+  relatedWriting?: { slug?: string | null; title?: LocaleValue }[] | null;
   coverImage?: RawCover | null;
   seo?: RawSeo | null;
   _updatedAt?: string | null;
+}
+
+function cleared(raw: RawCaseStudy): boolean {
+  return !raw.facts || raw.facts.mayBePublic === "yes";
 }
 
 function mapSummary(raw: RawCaseStudy, lang: Lang): CaseStudySummary | null {
   const slug = raw.slug?.trim();
   const title = pickLocaleOrNull(raw.title, lang);
   if (!slug || !title) return null;
+  const showFacts = cleared(raw);
+  const client =
+    raw.clientPublicName?.trim() ||
+    raw.clientName?.trim() ||
+    pickLocaleOrNull(raw.client, lang);
+  const year = typeof raw.year === "number" ? String(raw.year) : null;
   return {
     slug,
     title,
-    client: pickLocaleOrNull(raw.client, lang),
-    role: pickLocaleOrNull(raw.role, lang),
-    timeframe: pickLocaleOrNull(raw.timeframe, lang),
+    client: showFacts ? client : null,
+    role: showFacts ? pickLocaleOrNull(raw.role, lang) : null,
+    timeframe: showFacts ? year || pickLocaleOrNull(raw.timeframe, lang) : null,
     summary: pickLocaleOrNull(raw.summary, lang),
     featured: raw.featured === true,
     tags: asTags(raw.tags),
@@ -134,5 +155,10 @@ export async function getCaseStudy(
     metaDescription: pickLocaleOrNull(raw.seo?.metaDescription, lang),
     ogImageUrl:
       socialImageUrl(raw.seo?.ogImage) ?? socialImageUrl(raw.coverImage),
+    related: (raw.relatedWriting ?? []).flatMap((item) => {
+      const relatedSlug = item.slug?.trim();
+      const relatedTitle = pickLocaleOrNull(item.title, lang);
+      return relatedSlug && relatedTitle ? [{ slug: relatedSlug, title: relatedTitle }] : [];
+    }),
   };
 }

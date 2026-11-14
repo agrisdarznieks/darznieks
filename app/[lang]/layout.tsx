@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { Merriweather, Merriweather_Sans } from "next/font/google";
 import { GoogleTagManager } from "@next/third-parties/google";
 import { notFound } from "next/navigation";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ConsentBanner } from "@/components/custom/ConsentBanner";
 import { getDictionary, isLang, languages } from "@/lib/i18n";
+import { merriweather, merriweatherSans } from "@/lib/fonts";
 import { SITE_URL } from "@/lib/schema";
 import { cn } from "@/lib/utils";
 import "../globals.css";
@@ -39,20 +39,6 @@ try {
   }
 } catch (e) {}
 `;
-
-const merriweather = Merriweather({
-  variable: "--font-merriweather",
-  subsets: ["latin"],
-  weight: ["300", "400", "700"],
-  display: "swap",
-});
-
-const merriweatherSans = Merriweather_Sans({
-  variable: "--font-merriweather-sans",
-  subsets: ["latin"],
-  weight: ["400", "600", "700"],
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

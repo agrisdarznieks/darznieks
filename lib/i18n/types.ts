@@ -46,6 +46,7 @@ export interface Dictionary {
     role: string;
     timeframe: string;
     tags: string;
+    related: string;
   };
   writing: {
     title: string;
@@ -53,6 +54,8 @@ export interface Dictionary {
     empty: string;
     back: string;
     tags: string;
+    themes: string;
+    related: string;
   };
   notFound: {
     title: string;
