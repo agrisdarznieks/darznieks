@@ -14,6 +14,7 @@ export const structure: StructureResolver = (S) =>
             .documentId("siteSettings"),
         ),
       S.divider(),
-      S.documentTypeListItem("linkCard").title("Link cards"),
+      S.documentTypeListItem("caseStudy").title("Case studies"),
       S.documentTypeListItem("post").title("Blog posts"),
+      S.documentTypeListItem("linkCard").title("Link cards"),
     ]);

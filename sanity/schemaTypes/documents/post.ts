@@ -1,4 +1,5 @@
 import { defineType, defineField } from "sanity";
+import { coverImageField } from "../fields/coverImage";
 
 export const post = defineType({
   name: "post",
@@ -27,15 +28,20 @@ export const post = defineType({
       name: "publishedAt",
       title: "Published at",
       type: "datetime",
+      description:
+        "The site lists a post only once this time has passed. Leave it empty to keep the post unpublished.",
     }),
     defineField({ name: "excerpt", title: "Excerpt", type: "localeText" }),
-    defineField({
-      name: "coverImage",
-      title: "Cover image",
-      type: "image",
-      options: { hotspot: true },
-    }),
+    coverImageField,
     defineField({ name: "body", title: "Body", type: "localeBlockContent" }),
+    defineField({
+      name: "tags",
+      title: "Tags",
+      type: "array",
+      of: [{ type: "string" }],
+      options: { layout: "tags" },
+      description: "Shared across languages.",
+    }),
     defineField({ name: "seo", title: "SEO & social sharing", type: "seo" }),
   ],
   orderings: [
