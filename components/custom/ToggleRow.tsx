@@ -28,7 +28,7 @@ function LanguageSwitcher({ lang, a11y }: ToggleRowProps) {
   ];
 
   return (
-    <nav className="flex items-center gap-1" aria-label="Language">
+    <nav className="flex items-center gap-1" aria-label={a11y.language}>
       {options.map((option, index) => {
         const active = option.code === lang;
         return (
@@ -41,15 +41,15 @@ function LanguageSwitcher({ lang, a11y }: ToggleRowProps) {
             {active ? (
               <span
                 aria-current="true"
-                className="inline-flex min-h-[44px] items-center px-2 font-sans text-sm font-semibold text-foreground"
+                className="inline-flex min-h-11 min-w-11 items-center justify-center px-2 font-sans text-sm font-semibold text-foreground"
               >
                 {option.label}
               </span>
             ) : (
               <Link
                 href={swapLangInPath(pathname, option.code)}
-                aria-label={option.aria}
-                className="inline-flex min-h-[44px] items-center rounded-md px-2 font-sans text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                aria-label={`${option.label}, ${option.aria}`}
+                className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-md px-2 font-sans text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               >
                 {option.label}
               </Link>

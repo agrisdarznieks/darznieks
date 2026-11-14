@@ -1,8 +1,10 @@
-import { client } from "@/sanity/lib/client";
-import { urlFor, type SanityImageSource } from "@/sanity/lib/image";
-import { siteSettingsQuery, linkCardsQuery } from "@/sanity/lib/queries";
-import { getDictionary } from "@/lib/i18n";
+import { SANITY_TAGS } from "@/lib/cache";
+import { socialImageUrl } from "@/lib/cms";
+import { getDictionary, pickLocale, pickLocaleOrNull, type LocaleValue } from "@/lib/i18n";
 import type { Dictionary, Lang } from "@/lib/i18n/types";
+import { sanityFetch } from "@/sanity/lib/fetch";
+import type { SanityImageSource } from "@/sanity/lib/image";
+import { siteSettingsQuery, linkCardsQuery } from "@/sanity/lib/queries";
 
 export interface HomeCard {
   label: string;
@@ -28,16 +30,6 @@ export interface HomeContent {
   ogImageUrl: string | null;
 }
 
-type Locale = { en?: string; lv?: string } | null | undefined;
-
-function pick(value: Locale, lang: Lang, fallback: string): string {
-  return (value && (value[lang] ?? value.en)) || fallback;
-}
-
-function pickOrNull(value: Locale, lang: Lang): string | null {
-  return (value && (value[lang] ?? value.en)) || null;
-}
-
 // Code fallback — the current site content, so the page renders even before
 // anything is entered in Sanity Studio.
 function fallbackCards(dict: Dictionary): HomeCard[] {
@@ -54,24 +46,24 @@ function fallbackCards(dict: Dictionary): HomeCard[] {
 }
 
 interface RawSeo {
-  metaTitle?: Locale;
-  metaDescription?: Locale;
+  metaTitle?: LocaleValue;
+  metaDescription?: LocaleValue;
   ogImage?: SanityImageSource;
 }
 
 interface RawSettings {
   name?: string;
-  tagline?: Locale;
-  bio?: Locale;
+  tagline?: LocaleValue;
+  bio?: LocaleValue;
   avatarUrl?: string | null;
-  buildingHeading?: Locale;
-  findMeHeading?: Locale;
-  footer?: Locale;
+  buildingHeading?: LocaleValue;
+  findMeHeading?: LocaleValue;
+  footer?: LocaleValue;
   seo?: RawSeo;
 }
 
 interface RawCard {
-  label?: Locale;
+  label?: LocaleValue;
   href?: string;
   icon?: string;
   section?: "building" | "findMe";
@@ -86,18 +78,18 @@ export async function getHomeContent(lang: Lang): Promise<HomeContent> {
   let cards: RawCard[] = [];
   try {
     const [s, c] = await Promise.all([
-      client.fetch<RawSettings | null>(siteSettingsQuery),
-      client.fetch<RawCard[] | null>(linkCardsQuery),
+      sanityFetch<RawSettings | null>(siteSettingsQuery, {}, [SANITY_TAGS.siteSettings]),
+      sanityFetch<RawCard[] | null>(linkCardsQuery, {}, [SANITY_TAGS.linkCard]),
     ]);
     settings = s;
     cards = Array.isArray(c) ? c : [];
-  } catch {
-    // Sanity unreachable or empty — fall back to code content.
+  } catch (error) {
+    console.error("Sanity home content failed, using fallback copy.", error);
   }
 
   const mappedCards: HomeCard[] = cards.length
     ? cards.map((c) => ({
-        label: pick(c.label, lang, ""),
+        label: pickLocale(c.label, lang, ""),
         href: c.href || "#",
         icon: c.icon || "GlobeSimple",
         section: c.section === "building" ? "building" : "findMe",
@@ -106,29 +98,17 @@ export async function getHomeContent(lang: Lang): Promise<HomeContent> {
       }))
     : fallbackCards(dict);
 
-  // Build a 1200×630 OpenGraph URL off the Sanity image CDN when an ogImage
-  // is set; otherwise leave null and let the page fall back to the avatar.
-  let ogImageUrl: string | null = null;
-  const og = settings?.seo?.ogImage;
-  if (og) {
-    try {
-      ogImageUrl = urlFor(og).width(1200).height(630).fit("crop").url();
-    } catch {
-      ogImageUrl = null;
-    }
-  }
-
   return {
     name: settings?.name || dict.name,
-    tagline: pick(settings?.tagline, lang, dict.tagline),
-    bio: pick(settings?.bio, lang, dict.bio),
+    tagline: pickLocale(settings?.tagline, lang, dict.tagline),
+    bio: pickLocale(settings?.bio, lang, dict.bio),
     avatarUrl: settings?.avatarUrl || null,
-    buildingHeading: pick(settings?.buildingHeading, lang, dict.sections.building),
-    findMeHeading: pick(settings?.findMeHeading, lang, dict.sections.findMe),
-    footer: pick(settings?.footer, lang, dict.footer),
+    buildingHeading: pickLocale(settings?.buildingHeading, lang, dict.sections.building),
+    findMeHeading: pickLocale(settings?.findMeHeading, lang, dict.sections.findMe),
+    footer: pickLocale(settings?.footer, lang, dict.footer),
     cards: mappedCards,
-    metaTitle: pickOrNull(settings?.seo?.metaTitle, lang),
-    metaDescription: pickOrNull(settings?.seo?.metaDescription, lang),
-    ogImageUrl,
+    metaTitle: pickLocaleOrNull(settings?.seo?.metaTitle, lang),
+    metaDescription: pickLocaleOrNull(settings?.seo?.metaDescription, lang),
+    ogImageUrl: socialImageUrl(settings?.seo?.ogImage),
   };
 }

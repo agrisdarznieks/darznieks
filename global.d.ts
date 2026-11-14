@@ -1,5 +1,5 @@
 // Ambient types for the Google Consent Mode v2 gtag stub + GTM dataLayer.
-// The stub is defined inline in app/layout.tsx before GTM loads.
+// The stub is defined inline in app/[lang]/layout.tsx before GTM loads.
 export {};
 
 declare global {

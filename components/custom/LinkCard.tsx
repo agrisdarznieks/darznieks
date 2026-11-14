@@ -12,7 +12,7 @@ interface LinkCardProps {
 }
 
 const baseClasses =
-  "flex items-center gap-3 border border-border rounded-lg px-5 py-4 min-h-[56px] bg-card text-card-foreground transition-colors duration-150";
+  "flex items-center gap-3 border border-border rounded-lg px-5 py-4 min-h-[56px] bg-card text-card-foreground transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2";
 
 export function LinkCard({
   href,

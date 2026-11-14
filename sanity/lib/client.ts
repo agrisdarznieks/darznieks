@@ -6,4 +6,7 @@ export const client = createClient({
   dataset,
   apiVersion,
   useCdn: true,
+  // Published only. An implicit draft perspective would read cookies and opt
+  // every page that fetches content out of static rendering.
+  perspective: "published",
 });

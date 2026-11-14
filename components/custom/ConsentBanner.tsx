@@ -12,7 +12,7 @@ const STORAGE_KEY = "darznieks-consent";
  * On accept: flips `analytics_storage` to granted (GA4, routed through GTM, then
  * sets cookies) and pushes a `consent_granted` dataLayer event (the trigger that
  * fires the Clarity tag). On decline: consent stays at the denied default set in
- * app/layout.tsx, so GA4 sends only cookieless pings and Clarity never loads.
+ * app/[lang]/layout.tsx, so GA4 sends only cookieless pings and Clarity never loads.
  */
 export function ConsentBanner({ strings }: { strings: Dictionary["consent"] }) {
   const [visible, setVisible] = useState(false);
