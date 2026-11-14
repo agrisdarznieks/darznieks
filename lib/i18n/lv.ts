@@ -20,15 +20,45 @@ export const lv: Dictionary = {
   },
   footer: "© 2026 Agris Dārznieks",
   a11y: {
+    skipToContent: "Pāriet uz saturu",
+    language: "Valoda",
     switchLight: "Ieslēgt gaišo režīmu",
     switchDark: "Ieslēgt tumšo režīmu",
     switchToEn: "Switch to English",
     switchToLv: "Pārslēgties uz latviešu valodu",
+    image: "Attēls",
   },
   consent: {
     message:
       "Izmantoju privātumu cienošu analītiku, lai saprastu, kā šo vietni lieto. Sīkdatnes tiek ieslēgtas tikai ar tavu piekrišanu.",
     accept: "Piekrītu",
     decline: "Noraidu",
+  },
+  work: {
+    title: "Darbi",
+    description:
+      "Izvēlēti projektu stāsti — problēma, pieeja un tas, kas mainījās.",
+    empty: "Lietu izpētes vēl nav publicētas.",
+    back: "Visi darbi",
+    problem: "Problēma",
+    approach: "Pieeja",
+    outcomes: "Rezultāti",
+    featured: "Izcelts",
+    client: "Klients",
+    role: "Loma",
+    timeframe: "Laiks",
+    tags: "Birkas",
+  },
+  writing: {
+    title: "Raksti",
+    description: "Piezīmes par dizainu, rīkiem un to, kā top lietas.",
+    empty: "Rakstu vēl nav publicētu.",
+    back: "Visi raksti",
+    tags: "Birkas",
+  },
+  notFound: {
+    title: "Lapa nav atrasta",
+    body: "Šī saite neved uz nevienu lapu.",
+    home: "Uz sākumu",
   },
 };

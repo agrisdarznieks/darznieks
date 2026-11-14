@@ -5,12 +5,14 @@ import { seo } from "./objects/seo";
 import { siteSettings } from "./documents/siteSettings";
 import { linkCard } from "./documents/linkCard";
 import { post } from "./documents/post";
+import { caseStudy } from "./documents/caseStudy";
 
 export const schemaTypes = [
   // documents
   siteSettings,
   linkCard,
   post,
+  caseStudy,
   // objects
   localeString,
   localeText,

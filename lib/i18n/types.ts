@@ -20,14 +20,43 @@ export interface Dictionary {
   };
   footer: string;
   a11y: {
+    skipToContent: string;
+    language: string;
     switchLight: string;
     switchDark: string;
     switchToEn: string;
     switchToLv: string;
+    image: string;
   };
   consent: {
     message: string;
     accept: string;
     decline: string;
+  };
+  work: {
+    title: string;
+    description: string;
+    empty: string;
+    back: string;
+    problem: string;
+    approach: string;
+    outcomes: string;
+    featured: string;
+    client: string;
+    role: string;
+    timeframe: string;
+    tags: string;
+  };
+  writing: {
+    title: string;
+    description: string;
+    empty: string;
+    back: string;
+    tags: string;
+  };
+  notFound: {
+    title: string;
+    body: string;
+    home: string;
   };
 }

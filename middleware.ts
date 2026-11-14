@@ -19,7 +19,8 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const segment = pathname.split("/")[1];
 
-  // Root path: detect language and redirect to a locale-prefixed route.
+  // Unprefixed paths (including "/") redirect to a locale. Accept-Language
+  // picks Latvian when it is listed, otherwise English.
   if (!languages.includes(segment as never)) {
     const locale = detectLocale(request);
     const url = request.nextUrl.clone();
@@ -27,10 +28,10 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Locale-prefixed path: forward the active locale to the root layout.
-  const headers = new Headers(request.headers);
-  headers.set("x-locale", segment);
-  return NextResponse.next({ request: { headers } });
+  // Locale is read from the [lang] route param in the layout. Forwarding it
+  // through a request header would call headers() during render and force
+  // every page to be dynamic.
+  return NextResponse.next();
 }
 
 export const config = {

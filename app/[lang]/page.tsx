@@ -5,9 +5,10 @@ import { ToggleRow } from "@/components/custom/ToggleRow";
 import { getDictionary, isLang } from "@/lib/i18n";
 import { getHomeContent, type HomeCard } from "@/lib/content";
 import { resolveIcon } from "@/lib/icons";
-import { buildJsonLd, SITE_URL, DEFAULT_OG_IMAGE } from "@/lib/schema";
+import { localizedMetadata } from "@/lib/metadata";
+import { buildJsonLd, DEFAULT_OG_IMAGE } from "@/lib/schema";
 
-// ISR — re-fetch Sanity content at most once a minute.
+// ISR — re-fetch Sanity content at most once a minute, or sooner via the webhook.
 export const revalidate = 60;
 
 export async function generateMetadata({
@@ -21,31 +22,16 @@ export async function generateMetadata({
 
   const title = c.metaTitle || `${c.name} — ${c.tagline}`;
   const description = c.metaDescription || c.bio;
-  const ogImage = c.ogImageUrl || c.avatarUrl || DEFAULT_OG_IMAGE;
 
-  return {
+  return localizedMetadata({
+    lang: L,
+    path: "",
     title,
     description,
-    alternates: {
-      canonical: `/${L}`,
-      languages: { en: "/en", lv: "/lv", "x-default": "/en" },
-    },
-    openGraph: {
-      type: "website",
-      url: `${SITE_URL}/${L}`,
-      siteName: c.name,
-      title,
-      description,
-      locale: L === "lv" ? "lv_LV" : "en_US",
-      images: [{ url: ogImage, width: 1200, height: 630, alt: c.name }],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-      images: [ogImage],
-    },
-  };
+    image: c.ogImageUrl || c.avatarUrl || DEFAULT_OG_IMAGE,
+    imageAlt: c.name,
+    siteName: c.name,
+  });
 }
 
 function CardList({ cards }: { cards: HomeCard[] }) {
