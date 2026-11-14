@@ -1,36 +1,44 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# darznieks.com
 
-## Getting Started
+Personal site of Agris Dārznieks. Bilingual (English and Latvian) link-in-bio, with case studies at `/work` and writing at `/writing`. Content is edited in Sanity and the site is statically rendered, then refreshed on a short interval or when Sanity calls the revalidation webhook.
 
-First, run the development server:
+## Stack
+
+Next.js 15 (App Router), React 19, TypeScript, Tailwind CSS v4, shadcn/ui, next-themes, Sanity v6. Hosted on Vercel, which deploys `main`. Studio schemas live in this repo; the hosted Studio is separate.
+
+## Scripts
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run dev        # local site
+npm run build      # production build
+npm run start      # serve the production build
+npm run lint
+npm run typecheck
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Studio, when you need it locally: `npx sanity dev`. Deploying the Studio (`npx sanity deploy`) publishes schema changes to the hosted Studio. Do that on purpose. Do not write to the production dataset from scripts.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Copy `.env.example` to `.env.local`. The Sanity project id and dataset have public defaults. `NEXT_PUBLIC_GTM_ID` turns on Google Tag Manager and the consent banner. `SANITY_REVALIDATE_SECRET` signs the webhook that calls `POST /api/revalidate`.
 
-## Learn More
+Webhook (create, update, and delete):
 
-To learn more about Next.js, take a look at the following resources:
+- URL: `https://darznieks.com/api/revalidate`
+- Secret: the same value as `SANITY_REVALIDATE_SECRET`
+- Filter: `_type in ["post", "caseStudy", "siteSettings", "linkCard"]`
+- Projection: `{_type, "slug": slug.current}`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Routes
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Path | What it is |
+| --- | --- |
+| `/` | Redirects to `/en` or `/lv` from `Accept-Language` |
+| `/[lang]` | Homepage |
+| `/[lang]/work` and `/[lang]/work/[slug]` | Case studies |
+| `/[lang]/writing` and `/[lang]/writing/[slug]` | Posts with a publish date |
+| `/llms.txt`, `/robots.txt`, `/sitemap.xml` | Machine-readable extras |
 
-## Deploy on Vercel
+`[lang]` is `en` (default) or `lv`. Pages are generated at build time and revalidated about once a minute, or immediately when the webhook runs.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Conventions, accessibility, and things not to change are in [AGENTS.md](./AGENTS.md).
