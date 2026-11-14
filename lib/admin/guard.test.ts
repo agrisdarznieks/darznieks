@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   decideAccess,
+  deskCredentialLogin,
   e2eAdminBypassEnabled,
   isAllowedLogin,
   previewRewrite,
@@ -93,6 +94,34 @@ describe("admin auth guard", () => {
         ADMIN_E2E_TOKEN: "local-e2e-token-not-for-vercel-01",
       }),
     ).toBe(true);
+  });
+
+  it("treats a session cookie as a signal and still requires the allowlist", () => {
+    const env = { ADMIN_GITHUB_LOGIN: "agrisdarznieks" };
+    expect(
+      deskCredentialLogin({
+        cookieNames: ["authjs.session-token"],
+        e2eCookie: undefined,
+        env,
+      }),
+    ).toBe("agrisdarznieks");
+    expect(
+      deskCredentialLogin({
+        cookieNames: ["__Secure-authjs.session-token"],
+        e2eCookie: undefined,
+        env,
+      }),
+    ).toBe("agrisdarznieks");
+    expect(
+      deskCredentialLogin({ cookieNames: [], e2eCookie: undefined, env }),
+    ).toBeNull();
+    expect(
+      deskCredentialLogin({
+        cookieNames: ["authjs.session-token"],
+        e2eCookie: undefined,
+        env: {},
+      }),
+    ).toBeNull();
   });
 
   it("rewrites only article and case-study paths", () => {

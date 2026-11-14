@@ -6,6 +6,9 @@ export type Access =
 
 const E2E_COOKIE = "darznieks_admin_e2e";
 
+/** Auth.js session cookie names. Middleware only checks that one is present. */
+export const SESSION_COOKIE_NAMES = ["authjs.session-token", "__Secure-authjs.session-token"];
+
 export function e2eCookieName(): string {
   return E2E_COOKIE;
 }
@@ -21,6 +24,30 @@ export function e2eAdminBypassEnabled(
   if (env.ADMIN_E2E !== "1") return false;
   const token = env.ADMIN_E2E_TOKEN;
   return typeof token === "string" && token.length >= 24;
+}
+
+/**
+ * Edge-safe gate. A matching test cookie is trusted here because it never
+ * works when VERCEL is set. A session cookie is only a signal: the Node
+ * layout still verifies the JWT and the allowlist. Decrypting the JWT in
+ * middleware pulls Auth.js into the edge runtime, which Vercel rejects.
+ */
+export function deskCredentialLogin(input: {
+  cookieNames: readonly string[];
+  e2eCookie: string | undefined;
+  env?: Record<string, string | undefined>;
+}): string | null {
+  const env = input.env ?? process.env;
+  if (e2eAdminBypassEnabled(env)) {
+    const expected = env.ADMIN_E2E_TOKEN;
+    const login = env.ADMIN_GITHUB_LOGIN?.trim();
+    if (input.e2eCookie && expected && input.e2eCookie === expected && login) return login;
+  }
+  const allowlist = env.ADMIN_GITHUB_LOGIN?.trim();
+  if (allowlist && input.cookieNames.some((name) => SESSION_COOKIE_NAMES.includes(name))) {
+    return allowlist;
+  }
+  return null;
 }
 
 export function isAllowedLogin(

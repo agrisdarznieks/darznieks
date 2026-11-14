@@ -1,6 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { decideAccess, previewRewrite } from "@/lib/admin/guard";
-import { loginFromRequest } from "@/lib/admin/request-auth";
+import { decideAccess, deskCredentialLogin, e2eCookieName, previewRewrite } from "@/lib/admin/guard";
 import { defaultLang, isLang, languages } from "@/lib/i18n";
 
 const DRAFT_COOKIE = "__prerender_bypass";
@@ -24,13 +23,20 @@ function withRobots(response: NextResponse): NextResponse {
   return response;
 }
 
+function credentialLogin(request: NextRequest): string | null {
+  return deskCredentialLogin({
+    cookieNames: request.cookies.getAll().map((cookie) => cookie.name),
+    e2eCookie: request.cookies.get(e2eCookieName())?.value,
+  });
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (pathname.startsWith("/api/auth")) return NextResponse.next();
 
   if (pathname.startsWith("/admin") || pathname.startsWith("/api/admin")) {
-    const login = await loginFromRequest(request);
+    const login = credentialLogin(request);
     const access = decideAccess({
       pathname,
       login,
@@ -50,7 +56,7 @@ export async function middleware(request: NextRequest) {
 
   const previewPath = pathname.match(/^\/(en|lv)\/preview(\/|$)/);
   if (previewPath) {
-    const login = await loginFromRequest(request);
+    const login = credentialLogin(request);
     if (!login || !request.cookies.has(DRAFT_COOKIE)) {
       const url = request.nextUrl.clone();
       url.pathname = pathname.replace("/preview", "") || `/${defaultLang}`;
@@ -60,7 +66,7 @@ export async function middleware(request: NextRequest) {
   }
 
   if (request.cookies.has(DRAFT_COOKIE)) {
-    const login = await loginFromRequest(request);
+    const login = credentialLogin(request);
     const rewrite = login ? previewRewrite(pathname) : null;
     if (rewrite) {
       const url = request.nextUrl.clone();

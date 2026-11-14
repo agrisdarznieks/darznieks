@@ -21,6 +21,7 @@ function loginFromProfile(profile: unknown): string | null {
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  trustHost: true,
   providers: [GitHub({ authorization: { params: { scope: "read:user user:email" } } })],
   pages: {
     signIn: "/admin/login",
