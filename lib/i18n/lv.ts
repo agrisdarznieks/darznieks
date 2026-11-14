@@ -48,6 +48,7 @@ export const lv: Dictionary = {
     role: "Loma",
     timeframe: "Laiks",
     tags: "Birkas",
+    related: "Saistītie raksti",
   },
   writing: {
     title: "Raksti",
@@ -55,6 +56,8 @@ export const lv: Dictionary = {
     empty: "Rakstu vēl nav publicētu.",
     back: "Visi raksti",
     tags: "Birkas",
+    themes: "Tēmas",
+    related: "Saistītie raksti",
   },
   notFound: {
     title: "Lapa nav atrasta",

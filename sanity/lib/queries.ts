@@ -37,7 +37,8 @@ export const linkCardsQuery = `*[_type == "linkCard"] | order(order asc){
   order
 }`;
 
-const publishedPostFilter = `_type == "post" && defined(slug.current) && defined(publishedAt) && publishedAt <= now()`;
+// A missing status is legacy content and stays public. Draft and review never do.
+const publishedPostFilter = `_type == "post" && defined(slug.current) && defined(publishedAt) && publishedAt <= now() && (!defined(status) || status == "published")`;
 
 export const postSlugsQuery = `*[${publishedPostFilter}]{
   "slug": slug.current,
@@ -51,6 +52,7 @@ export const postsQuery = `*[${publishedPostFilter}] | order(publishedAt desc){
   publishedAt,
   excerpt,
   tags,
+  theme->{ name, "slug": slug.current },
   ${coverProjection}
 }`;
 
@@ -61,11 +63,13 @@ export const postBySlugQuery = `*[${publishedPostFilter} && slug.current == $slu
   excerpt,
   body,
   tags,
+  theme->{ name, "slug": slug.current },
+  "themeRoutable": theme->slug.current != "base" && count(*[${publishedPostFilter} && theme._ref == ^.theme._ref]) > 0,
   ${coverProjection},
   ${seoProjection}
 }`;
 
-const caseStudyFilter = `_type == "caseStudy" && defined(slug.current)`;
+const caseStudyFilter = `_type == "caseStudy" && defined(slug.current) && (!defined(status) || status == "published")`;
 
 export const caseStudySlugsQuery = `*[${caseStudyFilter}]{
   "slug": slug.current,
@@ -78,6 +82,10 @@ export const caseStudiesQuery = `*[${caseStudyFilter}] | order(featured desc, or
   client,
   role,
   timeframe,
+  year,
+  "clientName": clientRef->name,
+  "clientPublicName": clientRef->publicName,
+  facts{ mayBePublic },
   summary,
   featured,
   tags,
@@ -96,6 +104,38 @@ export const caseStudyBySlugQuery = `*[${caseStudyFilter} && slug.current == $sl
   outcomes,
   featured,
   tags,
+  year,
+  "clientName": clientRef->name,
+  "clientPublicName": clientRef->publicName,
+  facts{ mayBePublic },
+  "relatedWriting": *[_type == "post" && _id in ^.relatedPosts[]._ref && defined(slug.current) && defined(publishedAt) && publishedAt <= now() && (!defined(status) || status == "published")]{
+    title,
+    "slug": slug.current,
+    publishedAt
+  },
   ${coverProjection},
   ${seoProjection}
+}`;
+
+export const routableThemesQuery = `*[_type == "theme" && slug.current != "base" && count(*[${publishedPostFilter} && theme._ref == ^._id]) > 0]{
+  _id,
+  name,
+  "slug": slug.current,
+  tagline,
+  taglineApproval,
+  intro,
+  status,
+  _updatedAt,
+  ${coverProjection}
+}`;
+
+export const themeBySlugQuery = `*[_type == "theme" && slug.current == $slug && slug.current != "base"][0]{
+  _id,
+  name,
+  "slug": slug.current,
+  tagline,
+  taglineApproval,
+  intro,
+  status,
+  ${coverProjection}
 }`;

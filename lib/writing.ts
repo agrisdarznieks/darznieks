@@ -1,10 +1,16 @@
 import { SANITY_TAGS } from "@/lib/cache";
 import { asTags, mapCover, socialImageUrl, type CoverImage, type RawCover } from "@/lib/cms";
-import { pickBlocks, pickLocaleOrNull, type LocaleValue } from "@/lib/i18n";
+import { pickBlocks, pickLocale, pickLocaleOrNull, type LocaleValue } from "@/lib/i18n";
 import type { Lang } from "@/lib/i18n/types";
 import { sanityFetch } from "@/sanity/lib/fetch";
 import type { SanityImageSource } from "@/sanity/lib/image";
 import { postBySlugQuery, postSlugsQuery, postsQuery } from "@/sanity/lib/queries";
+
+export interface PostTheme {
+  slug: string;
+  name: string;
+  routable: boolean;
+}
 
 export interface PostSummary {
   slug: string;
@@ -14,6 +20,7 @@ export interface PostSummary {
   tags: string[];
   cover: CoverImage | null;
   updatedAt: string | null;
+  theme: PostTheme | null;
 }
 
 export interface Post extends PostSummary {
@@ -42,6 +49,8 @@ interface RawPost {
   excerpt?: LocaleValue;
   body?: { en?: unknown; lv?: unknown } | null;
   tags?: unknown;
+  theme?: { name?: LocaleValue; slug?: string | null } | null;
+  themeRoutable?: boolean | null;
   coverImage?: RawCover | null;
   seo?: RawSeo | null;
   _updatedAt?: string | null;
@@ -59,6 +68,13 @@ function mapSummary(raw: RawPost, lang: Lang): PostSummary | null {
     tags: asTags(raw.tags),
     cover: mapCover(raw.coverImage, lang, title),
     updatedAt: raw._updatedAt ?? null,
+    theme: raw.theme?.slug
+      ? {
+          slug: raw.theme.slug,
+          name: pickLocale(raw.theme.name, lang, raw.theme.slug),
+          routable: raw.themeRoutable === true && raw.theme.slug !== "base",
+        }
+      : null,
   };
 }
 

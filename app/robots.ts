@@ -5,7 +5,13 @@ import type { MetadataRoute } from "next";
 // the site from those engines' answers.
 export default function robots(): MetadataRoute.Robots {
   return {
-    rules: [{ userAgent: "*", allow: "/" }],
+    rules: [
+      {
+        userAgent: "*",
+        allow: "/",
+        disallow: ["/admin", "/api/admin", "/en/preview", "/lv/preview"],
+      },
+    ],
     sitemap: "https://darznieks.com/sitemap.xml",
     host: "https://darznieks.com",
   };

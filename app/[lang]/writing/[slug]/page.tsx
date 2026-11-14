@@ -8,13 +8,16 @@ import { formatPublished } from "@/lib/cms";
 import { getDictionary, isLang } from "@/lib/i18n";
 import { localizedMetadata } from "@/lib/metadata";
 import { SITE_URL } from "@/lib/schema";
+import { getRoutableThemes, getThemeHub } from "@/lib/themes";
 import { getPost, getPostSlugs } from "@/lib/writing";
 
 export const revalidate = 60;
 
 export async function generateStaticParams() {
-  const posts = await getPostSlugs();
-  return posts.map((post) => ({ slug: post.slug }));
+  const [posts, themes] = await Promise.all([getPostSlugs(), getRoutableThemes("en")]);
+  return [...new Set([...posts.map((post) => post.slug), ...themes.map((theme) => theme.slug)])].map(
+    (slug) => ({ slug }),
+  );
 }
 
 export async function generateMetadata({
@@ -26,7 +29,18 @@ export async function generateMetadata({
   const L = isLang(lang) ? lang : "en";
   const post = await getPost(L, slug);
   const dict = getDictionary(L);
-  if (!post) return { title: dict.notFound.title };
+  if (!post) {
+    const hub = await getThemeHub(L, slug);
+    if (!hub) return { title: dict.notFound.title };
+    return localizedMetadata({
+      lang: L,
+      path: `/writing/${hub.slug}`,
+      title: `${hub.name} — Agris Dārznieks`,
+      description: hub.tagline || hub.intro || dict.writing.description,
+      image: hub.cover?.url,
+      imageAlt: hub.cover?.alt || hub.name,
+    });
+  }
   return localizedMetadata({
     lang: L,
     path: `/writing/${post.slug}`,
@@ -45,9 +59,46 @@ export default async function PostPage({
 }) {
   const { lang, slug } = await params;
   if (!isLang(lang)) notFound();
-  const post = await getPost(lang, slug);
-  if (!post) notFound();
   const dict = getDictionary(lang);
+  const post = await getPost(lang, slug);
+  if (!post) {
+    const hub = await getThemeHub(lang, slug);
+    if (!hub) notFound();
+    return (
+      <SiteFrame lang={lang}>
+        <main id="main-content">
+          <Link
+            href={`/${lang}/writing`}
+            className="inline-flex min-h-11 items-center font-sans text-sm text-muted-foreground underline decoration-border underline-offset-4 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          >
+            {dict.writing.back}
+          </Link>
+          <h1 className="mt-2 font-sans text-3xl font-bold">{hub.name}</h1>
+          {hub.tagline ? (
+            <p className="mt-3 font-serif text-base leading-[1.75] text-muted-foreground">{hub.tagline}</p>
+          ) : null}
+          {hub.intro ? (
+            <p className="mt-3 font-serif text-base leading-[1.75]">{hub.intro}</p>
+          ) : null}
+          {hub.cover ? <CoverImage cover={hub.cover} priority /> : null}
+          <ul className="mt-10 flex flex-col gap-8">
+            {hub.posts.map((item) => (
+              <li key={item.slug}>
+                <h2>
+                  <Link
+                    href={`/${lang}/writing/${item.slug}`}
+                    className="inline-flex min-h-11 items-center font-sans text-xl font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  >
+                    {item.title}
+                  </Link>
+                </h2>
+              </li>
+            ))}
+          </ul>
+        </main>
+      </SiteFrame>
+    );
+  }
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -74,6 +125,16 @@ export default async function PostPage({
         >
           {dict.writing.back}
         </Link>
+        {post.theme?.routable ? (
+          <p className="mt-4 font-sans text-sm">
+            <Link
+              href={`/${lang}/writing/${post.theme.slug}`}
+              className="inline-flex min-h-11 items-center underline decoration-border underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            >
+              {post.theme.name}
+            </Link>
+          </p>
+        ) : null}
         <h1 className="mt-2 font-sans text-3xl font-bold">{post.title}</h1>
         <time
           dateTime={post.publishedAt}
